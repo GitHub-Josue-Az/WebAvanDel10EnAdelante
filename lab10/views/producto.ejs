@@ -1,0 +1,23 @@
+<table border="1">
+
+	<tr>
+		<th>Producto</th>
+		<th>Precio</th>
+		<th>Categoria</th>
+		<th>crear</th>
+	</tr>
+
+<%lista.forEach(function(prod){ %>
+
+<tr>
+		<th><%= prod.nombre %></th>
+		<th><%= prod.precio %></th>
+		<th><%= prod.categoria_id.nombre %></th>
+	</tr>
+	
+<% }); %>
+
+
+</table>
+
+

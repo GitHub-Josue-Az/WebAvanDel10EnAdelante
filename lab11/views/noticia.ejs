@@ -1,0 +1,143 @@
+ <p> <button class="btn btn-primary btnNuevo">Nuevo</button> </p>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Nuevo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form class="form-horizontal" >
+        	<input id="id" type="hidden" value=""/>
+        	<div class="form-group row">
+        		<label class="col-sm-2 control-label" for="inputTitulo">Titulo</label>
+        		<div class="col-sm-10">
+        	<input class="form-control" id="inputTitulo" type="text" placeholder="Nombre"/></div>
+        	</div>
+
+        	<div class="form-group row"><label class="col-sm-2 control-label" for="inputDescripcion">Descripcion</label><div class="col-sm-10"><input class="form-control" id="inputDescripcion" type="text" placeholder="Nombre"/></div></div>
+
+        	<div class="form-group row"><label class="col-sm-2 control-label" for="inputCategoria">Categoria</label><div class="col-sm-10"><input class="form-control" id="inputCategoria" type="text" placeholder="Nombre"/></div></div>
+
+        	<div class="form-group row"><label class="col-sm-2 control-label" for="inputFechae">Fecha</label><div class="col-sm-10"><input class="form-control" id="inputFecha" type="text" placeholder="Nombre"/></div></div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btnGuardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<table id="dataTable" class="table">
+
+  <thead>
+    <th>Titulo</th>
+    <th>Fecha</th>
+    <th>Acciones</th>
+
+  </thead>
+</table>
+
+
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">Special title treatment</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>
+
+<script>
+
+$('.btnNuevo').click(function(){
+	$('#myModal').modal('show');
+});
+
+
+$('.btnGuardar').click(function(){
+
+	datos={
+		titulo : $('#inputTitulo').val(),
+		descripcion: $('#inputDescripcion').val(),
+		categoria: $('#inputCategoria').val(),
+		fecha: $('#inputFecha').val()
+	};
+
+	val_id= $('#id').val();
+		if(val_id==''){
+			ruta = 'noticia/crear';
+		}else{
+			ruta = 'noticia/actualizar';
+			datos.id= val_id;
+		}
+
+	$.post(ruta,datos,function(data){
+		console.log(data);
+		$('#Titulo').val('');
+		$('#Descripcion').val('');
+		$('#Categoria').val('');
+		$('#Fecha').val('');
+		$('#myModal').modal('hide');
+		$('#dataTable').DataTable().ajax.reload();
+	});
+});
+
+
+$("#dataTable").on('click','.btnEditar',function(){
+	val_id = $(this).data('id');
+	$.get('noticia/detalle/'+val_id,function(data){
+		$('#id').val(data._id);
+		$('#inputTitulo').val(data.titulo);
+		$('#inputDescripcion').val(data.descripcion);
+		$('#inputCategoria').val(data.categoria);
+		$('#inputFecha').val(data.fecha);
+		$('#myModal').modal('show');
+	})
+});
+
+
+$("#dataTable").on('click','.btnElimnar',function(){
+	val_id = $(this).data('id');
+		
+		if(confirm('Desea eliminar este registro')){
+			$.post('noticia/eliminar'+{id : val_id},function(data){
+				$('#dataTable').DataTable().ajax.reload();
+		});
+	}
+});
+
+
+$("#dataTable").dataTable({
+	"processing" : true,
+	"ajax":{
+		"url":"http://localhost:3000/noticia/listar",
+		"dataSrc":""
+	},
+	"columns":[
+		{"data":"titulo"},
+		{"data":"fecha"},
+		{"data":null,
+		"render": function(data, tye, row, meta){
+			html='<td><button data-id="'+data._id+'" class="btn btn-info btnEditar"><i class="fas fa-edit"></i></button></td>';
+			html+='<td><button data-id="'+data._id+'" class="btn btn-danger btnElimnar"><i class="fas fa-trash"></i></button></td>';
+			return  html;
+		}}
+	]
+});
+
+
+</script>
+
+
